@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Resultados y reportes de pruebas
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+
+# Compilado
+dist/
+
+# Variables de entorno
+.env
+.env.local
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Specs generados por playwright-bdd
+.features-gen/
