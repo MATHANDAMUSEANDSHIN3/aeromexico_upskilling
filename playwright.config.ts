@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig } from 'playwright-bdd';
 import { config } from './src/config';
 
@@ -19,9 +19,16 @@ export default defineConfig({
     ['html', { open: 'never' }],
   ],
   use: {
-    baseURL: process.env.BASE_URL ?? config.baseUrl,
+    baseURL: process.env.BASE_URL ?? config.storefrontUrl,
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
   },
+  // Matriz cross-browser: cada ejecución corre la suite una vez por proyecto.
+  // Seleccionar con: pnpm run test:bdd --project=firefox (o sin --project para todos)
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
 });

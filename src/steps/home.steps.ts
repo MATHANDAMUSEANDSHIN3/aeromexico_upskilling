@@ -9,13 +9,13 @@ import { FlightSearchPage } from '../pages/FlightSearchPage';
  */
 const { Given, When, Then } = createBdd();
 
-Given('que estoy en la página principal', async ({ page }) => {
+Given('que el usuario se encuentra en la página principal de Aeroméxico', async ({ page }) => {
   const flightSearchPage = new FlightSearchPage(page);
   await flightSearchPage.open();
 });
 
 When(
-  'completo origen {string}, destino {string} y selecciono una fecha',
+  'el usuario ingresa el origen {string}, el destino {string} y una fecha válida',
   async ({ page }, origin: string, destination: string) => {
     const flightSearchPage = new FlightSearchPage(page);
     await flightSearchPage.selectOrigin(origin, 'MEX');
@@ -24,12 +24,18 @@ When(
   },
 );
 
-When('presiono el botón de búsqueda', async ({ page }) => {
-  const flightSearchPage = new FlightSearchPage(page);
-  await flightSearchPage.clickSearch();
-});
+When(
+  'el usuario busca un vuelo desde {string} hacia {string} para una fecha válida',
+  async ({ page }, origin: string, destination: string) => {
+    const flightSearchPage = new FlightSearchPage(page);
+    await flightSearchPage.selectOrigin(origin, 'MEX');
+    await flightSearchPage.selectDestination(destination, 'GDL');
+    await flightSearchPage.selectFirstAvailableDay();
+    await flightSearchPage.clickSearch();
+  },
+);
 
-Then('el título de la página contiene {string}', async ({ page }, text: string) => {
+Then('el título de la página debe contener {string}', async ({ page }, text: string) => {
   // Tolerante a acentos: "Aeroméxico" (es-mx) vs "Aeromexico" (storefronts en inglés)
   const accentInsensitive = text
     .replace(/[aá]/gi, '[aá]')
@@ -40,33 +46,27 @@ Then('el título de la página contiene {string}', async ({ page }, text: string
   await expect(page).toHaveTitle(new RegExp(accentInsensitive, 'i'));
 });
 
-Then('el campo de origen es visible', async ({ page }) => {
-  const flightSearchPage = new FlightSearchPage(page);
-  await expect(flightSearchPage.originInput).toBeVisible();
-});
+Then(
+  'el formulario de búsqueda debe estar disponible con la opción de búsqueda deshabilitada',
+  async ({ page }) => {
+    const flightSearchPage = new FlightSearchPage(page);
+    await expect(flightSearchPage.originInput).toBeVisible();
+    await expect(flightSearchPage.destinationInput).toBeVisible();
+    await expect(flightSearchPage.searchButton).toBeVisible();
+    await flightSearchPage.expectSearchDisabled();
+  },
+);
 
-Then('el campo de destino es visible', async ({ page }) => {
-  const flightSearchPage = new FlightSearchPage(page);
-  await expect(flightSearchPage.destinationInput).toBeVisible();
-});
-
-Then('el botón de búsqueda es visible', async ({ page }) => {
-  const flightSearchPage = new FlightSearchPage(page);
-  await expect(flightSearchPage.searchButton).toBeVisible();
-});
-
-Then('el botón de búsqueda está deshabilitado', async ({ page }) => {
-  const flightSearchPage = new FlightSearchPage(page);
-  await flightSearchPage.expectSearchDisabled();
-});
-
-Then('el botón de búsqueda está habilitado', async ({ page }) => {
+Then('la opción para realizar la búsqueda debe estar habilitada', async ({ page }) => {
   const flightSearchPage = new FlightSearchPage(page);
   await flightSearchPage.expectSearchEnabled();
 });
 
-Then('se dispara la búsqueda de vuelos', async ({ page }) => {
-  // Al buscar, la app navega fuera de la home hacia resultados (SPA, transición lenta)
-  await page.waitForURL((url) => !url.href.includes('/new/es-mx'), { timeout: 60000 });
-  expect(page.url()).not.toContain('/new/es-mx');
-});
+Then(
+  'el sistema debe procesar la solicitud y mostrar los vuelos disponibles para la ruta seleccionada',
+  async ({ page }) => {
+    // Al buscar, la app navega fuera de la home hacia resultados (SPA, transición lenta)
+    await page.waitForURL((url) => !url.href.includes('/new/es-mx'), { timeout: 60000 });
+    expect(page.url()).not.toContain('/new/es-mx');
+  },
+);

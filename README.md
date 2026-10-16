@@ -1,4 +1,6 @@
-Framework de automatización de pruebas Web UI con **Playwright + TypeScript + BDD (Gherkin)** y reportes **Allure**.
+# QA Automation Sessions
+
+Framework de automatización de pruebas Web UI con **Playwright + TypeScript + BDD (Gherkin)** y reportes **Allure**. con **Playwright + TypeScript + BDD (Gherkin)** y reportes **Allure**.
 
 Los escenarios se escriben en Gherkin (`.feature`) y se ejecutan con el runner de Playwright mediante el adaptador [playwright-bdd](https://github.com/vitalets/playwright-bdd) — no requiere el runner de Cucumber.
 
